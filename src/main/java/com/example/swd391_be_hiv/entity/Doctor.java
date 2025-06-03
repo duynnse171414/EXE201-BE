@@ -1,43 +1,56 @@
 package com.example.swd391_be_hiv.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
-
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@Table(name = "doctor")
 public class Doctor {
 
     @Id
-    @Column(name = "Doctor_ID")
-     Long doctorId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Thêm GeneratedValue
+    private Long id;
 
-    @Column(name = "User_ID")
-     Long userId;
+    String name;
 
-    @Column(name = "Qualifications")
-     String qualifications;
+    @Column(name = "customer_id") // Đặt tên column rõ ràng
+    private Long customerId;
 
-    @Column(name = "Specialization")
-     String specialization;
+    @JsonIgnore
+    @Column(name = "is_deleted") // Sửa tên field cho đúng với repository
+    private boolean deleted = false;
 
-    @Column(name = "Work_schedule")
-     String workSchedule;
+    @Column(name = "qualifications") // Loại bỏ viết hoa không cần thiết
+    private String qualifications;
+
+    @Column(name = "specialization")
+    private String specialization;
+
+    @Column(name = "work_schedule")
+    private String workSchedule;
 
     // Fixed relationships
-    @OneToMany(mappedBy = "doctor")
-     List<MedicalRecord> medicalRecords;
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore // Tránh circular reference
+    private List<MedicalRecord> medicalRecords;
 
-    @OneToMany(mappedBy = "doctor")
-     List<Appointment> appointments;
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Appointment> appointments;
 
-    @OneToMany(mappedBy = "doctor")
-     List<TreatmentPlan> treatmentPlans;
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<TreatmentPlan> treatmentPlans;
 
-    @OneToMany
-    @JoinColumn(name = "Doctor_ID")
-     List<LabResult> labResults;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "doctor_id") // Sử dụng snake_case
+    @JsonIgnore
+    private List<LabResult> labResults;
+
 }
