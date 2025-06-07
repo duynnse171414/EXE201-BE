@@ -1,5 +1,6 @@
 package com.example.swd391_be_hiv.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,4 +36,8 @@ public class Appointment {
 
     @Column(name = "Datetime")
      LocalDateTime datetime;
+
+    @JsonIgnore
+    @Column(name = "is_deleted") // Sửa tên field cho đúng với repository
+    private boolean deleted = false;
 }

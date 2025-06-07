@@ -48,5 +48,47 @@ public class AppointmentService {
     public List<Appointment> getAppointmentsByCustomer(Long customerId) {
         return appointmentRepository.findByCustomer_Id(customerId);
     }
+
+    public List<Appointment> getAllAppointment() {
+        List<Appointment> appointments = appointmentRepository.findByDeletedFalse();
+        return appointments;
+    }
+
+
+    public List<Appointment> getAppointmentsByDoctorId(Long doctorId) {
+        if (doctorId == null) {
+            throw new IllegalArgumentException("Doctor ID không được để trống");
+        }
+        return appointmentRepository.findByDoctorIdAndNotDeleted(doctorId);
+    }
+
+    /**
+     * Lấy appointments theo Doctor ID và Status
+     */
+    public List<Appointment> getAppointmentsByDoctorIdAndStatus(Long doctorId, String status) {
+        if (doctorId == null) {
+            throw new IllegalArgumentException("Doctor ID không được để trống");
+        }
+        if (status == null || status.trim().isEmpty()) {
+            throw new IllegalArgumentException("Status không được để trống");
+        }
+        return appointmentRepository.findByDoctorIdAndStatusAndNotDeleted(doctorId, status);
+    }
+
+    /**
+     * Kiểm tra xem doctor có appointments hay không
+     */
+    public boolean hasDoctorAppointments(Long doctorId) {
+        List<Appointment> appointments = getAppointmentsByDoctorId(doctorId);
+        return !appointments.isEmpty();
+    }
+
+    /**
+     * Đếm số lượng appointments của doctor
+     */
+    public long countAppointmentsByDoctorId(Long doctorId) {
+        List<Appointment> appointments = getAppointmentsByDoctorId(doctorId);
+        return appointments.size();
+    }
 }
 
