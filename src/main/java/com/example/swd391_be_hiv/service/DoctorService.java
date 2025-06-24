@@ -23,7 +23,7 @@ public class DoctorService {
     DoctorRepository doctorRepository;
 
     public Doctor createNewDoctor(DoctorRequest doctorRequest) {
-        // Kiểm tra xem doctor với customerId đã tồn tại chưa
+
         if (doctorRepository.findByCustomerIdAndDeletedFalse(doctorRequest.getCustomerId()).isPresent()) {
             throw new DuplicateEntity("Doctor with this customer ID already exists");
         }
@@ -50,7 +50,7 @@ public class DoctorService {
         Doctor oldDoctor = doctorRepository.findByIdAndDeletedFalse(doctorId)
                 .orElseThrow(() -> new NotFoundException("Doctor not found with ID: " + doctorId));
 
-        // Update fields
+
         oldDoctor.setCustomerId(doctor.getCustomerId());
         oldDoctor.setQualifications(doctor.getQualifications());
         oldDoctor.setSpecialization(doctor.getSpecialization());

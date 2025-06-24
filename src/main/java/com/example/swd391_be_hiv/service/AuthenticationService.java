@@ -42,11 +42,11 @@ public class AuthenticationService implements UserDetailsService {
     @Autowired
     TokenService tokenService;
 
-    // Temporary store for OTPs
+
     private Map<String, String> otpStore = new HashMap<>();
     private Map<String, Long> otpExpirationStore = new HashMap<>();
 
-    // Define the expiration time for OTPs (e.g., 5 minutes)
+
     private static final long OTP_EXPIRATION_TIME = 300000; // in milliseconds
 
     private boolean isOtpExpired(Long expirationTime) {
@@ -55,15 +55,15 @@ public class AuthenticationService implements UserDetailsService {
 
 
     public AccountResponse register(RegisterRequest registerRequest) {
-        // map RegisterRequest => Account
+
         Account account = modelMapper.map(registerRequest, Account.class);
 
-        // Kiểm tra gender ngay lập tức
+
         if (!account.getGender().equals("Male") && !account.getGender().equals("Female")) {
             throw new IllegalArgumentException("Not Valid Gender!");
         }
 
-        // Kiểm tra xem số điện thoại đã tồn tại chưa
+
         if (accountRepository.findAccountByPhone(account.getPhone()) != null) {
             throw new DuplicateEntity("Duplicate phone!");
         }
@@ -73,14 +73,14 @@ public class AuthenticationService implements UserDetailsService {
         }
 
         try {
-            // Mã hóa mật khẩu
+
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));
 
-            // Lưu tài khoản mới vào database
+
             Account newAccount = accountRepository.save(account);
 
-            // Trả về thông tin tài khoản đã tạo
+
             return modelMapper.map(newAccount, AccountResponse.class);
         } catch (Exception e) {
             throw new RuntimeException("An unexpected error occurred: " + e.getMessage());

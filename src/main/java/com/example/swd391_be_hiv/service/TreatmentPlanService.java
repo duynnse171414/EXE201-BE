@@ -29,14 +29,14 @@ public class TreatmentPlanService {
 
     public TreatmentPlanResponse createTreatmentPlan(TreatmentPlanRequest requestDTO) {
         try {
-            // Validate doctor and medical record exist
+
             Doctor doctor = doctorRepository.findById(requestDTO.getDoctorId())
                     .orElseThrow(() -> new NotFoundException("Doctor not found"));
 
             MedicalRecord medicalRecord = medicalRecordRepository.findById(requestDTO.getMedicalRecordId())
                     .orElseThrow(() -> new NotFoundException("Medical record not found"));
 
-            // Convert DTO to entity
+
             TreatmentPlan treatmentPlan = new TreatmentPlan();
             treatmentPlan.setDoctor(doctor);
             treatmentPlan.setMedicalRecord(medicalRecord);
@@ -66,14 +66,14 @@ public class TreatmentPlanService {
             throw new NotFoundException("Treatment plan not found");
         }
 
-        // Validate doctor and medical record if they are being changed
+
         Doctor doctor = doctorRepository.findById(requestDTO.getDoctorId())
                 .orElseThrow(() -> new NotFoundException("Doctor not found"));
 
         MedicalRecord medicalRecord = medicalRecordRepository.findById(requestDTO.getMedicalRecordId())
                 .orElseThrow(() -> new NotFoundException("Medical record not found"));
 
-        // Update fields
+
         existingPlan.setDoctor(doctor);
         existingPlan.setMedicalRecord(medicalRecord);
         existingPlan.setArvRegimen(requestDTO.getArvRegimen());
@@ -121,7 +121,7 @@ public class TreatmentPlanService {
         dto.setNote(treatmentPlan.getNote());
         dto.setStartDate(treatmentPlan.getStartDate());
 
-        // Get patient name from medical record if customer exists
+
         if (treatmentPlan.getMedicalRecord().getCustomer() != null) {
             dto.setPatientName(treatmentPlan.getMedicalRecord().getCustomer().getAccount().getFullName()); // Assuming Customer has getName()
         }

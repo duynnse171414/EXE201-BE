@@ -24,7 +24,7 @@ public class CustomerAPI {
     @Autowired
     private CustomerService customerService;
 
-    // GET /api/customers - Lấy tất cả customer
+
     @GetMapping
     public ResponseEntity<List<Customer>> getAllCustomers() {
         try {

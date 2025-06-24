@@ -4,6 +4,8 @@ import com.example.swd391_be_hiv.entity.Appointment;
 import com.example.swd391_be_hiv.entity.Customer;
 import com.example.swd391_be_hiv.entity.Doctor;
 import com.example.swd391_be_hiv.model.request.AppointmentRequest;
+import com.example.swd391_be_hiv.model.reponse.AppointmentResponse;
+import com.example.swd391_be_hiv.model.reponse.AppointmentDetailResponse;
 import com.example.swd391_be_hiv.repository.AppointmentRepository;
 import com.example.swd391_be_hiv.repository.CustomerRepository;
 import com.example.swd391_be_hiv.repository.DoctorRepository;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AppointmentService {
@@ -45,50 +48,84 @@ public class AppointmentService {
         return "Appointment booked successfully.";
     }
 
-    public List<Appointment> getAppointmentsByCustomer(Long customerId) {
-        return appointmentRepository.findByCustomer_Id(customerId);
+    public List<AppointmentResponse> getAppointmentsByCustomer(Long customerId) {
+        List<Appointment> appointments = appointmentRepository.findByCustomer_Id(customerId);
+        return appointments.stream()
+                .map(AppointmentResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 
-    public List<Appointment> getAllAppointment() {
+    public List<AppointmentResponse> getAllAppointment() {
         List<Appointment> appointments = appointmentRepository.findByDeletedFalse();
-        return appointments;
+        return appointments.stream()
+                .map(AppointmentResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 
-
-    public List<Appointment> getAppointmentsByDoctorId(Long doctorId) {
+    public List<AppointmentResponse> getAppointmentsByDoctorId(Long doctorId) {
         if (doctorId == null) {
             throw new IllegalArgumentException("Doctor ID không được để trống");
         }
-        return appointmentRepository.findByDoctorIdAndNotDeleted(doctorId);
+        List<Appointment> appointments = appointmentRepository.findByDoctorIdAndNotDeleted(doctorId);
+        return appointments.stream()
+                .map(AppointmentResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Lấy appointments theo Doctor ID và Status
-     */
-    public List<Appointment> getAppointmentsByDoctorIdAndStatus(Long doctorId, String status) {
+
+    public List<AppointmentResponse> getAppointmentsByDoctorIdAndStatus(Long doctorId, String status) {
         if (doctorId == null) {
             throw new IllegalArgumentException("Doctor ID không được để trống");
         }
         if (status == null || status.trim().isEmpty()) {
             throw new IllegalArgumentException("Status không được để trống");
         }
-        return appointmentRepository.findByDoctorIdAndStatusAndNotDeleted(doctorId, status);
+        List<Appointment> appointments = appointmentRepository.findByDoctorIdAndStatusAndNotDeleted(doctorId, status);
+        return appointments.stream()
+                .map(AppointmentResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Kiểm tra xem doctor có appointments hay không
-     */
+
+    public AppointmentDetailResponse getAppointmentDetail(Long appointmentId) {
+        if (appointmentId == null) {
+            throw new IllegalArgumentException("Appointment ID không được để trống");
+        }
+
+        Optional<Appointment> appointmentOpt = appointmentRepository.findById(appointmentId);
+        if (appointmentOpt.isEmpty()) {
+            throw new IllegalArgumentException("Không tìm thấy appointment với ID: " + appointmentId);
+        }
+
+        Appointment appointment = appointmentOpt.get();
+        if (appointment.isDeleted()) {
+            throw new IllegalArgumentException("Appointment đã bị xóa");
+        }
+
+        return AppointmentDetailResponse.fromEntity(appointment);
+    }
+
+
     public boolean hasDoctorAppointments(Long doctorId) {
-        List<Appointment> appointments = getAppointmentsByDoctorId(doctorId);
+        List<AppointmentResponse> appointments = getAppointmentsByDoctorId(doctorId);
         return !appointments.isEmpty();
     }
 
-    /**
-     * Đếm số lượng appointments của doctor
-     */
     public long countAppointmentsByDoctorId(Long doctorId) {
-        List<Appointment> appointments = getAppointmentsByDoctorId(doctorId);
+        List<AppointmentResponse> appointments = getAppointmentsByDoctorId(doctorId);
         return appointments.size();
     }
-}
 
+
+    public List<AppointmentResponse> getAppointmentsByStatus(String status) {
+        if (status == null || status.trim().isEmpty()) {
+            throw new IllegalArgumentException("Status không được để trống");
+        }
+
+        List<Appointment> appointments = appointmentRepository.findByDeletedFalse();
+        return appointments.stream()
+                .filter(appointment -> status.equalsIgnoreCase(appointment.getStatus()))
+                .map(AppointmentResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
+}

@@ -36,23 +36,18 @@ public interface MedicalRecordRepository extends JpaRepository<MedicalRecord, Lo
 
     List<MedicalRecord> findMedicalRecordsByLastUpdatedBetween(LocalDateTime startDate, LocalDateTime endDate);
 
-    // Get medical records by active doctors only (not deleted)
     List<MedicalRecord> findMedicalRecordsByDoctor_DeletedFalse();
 
-    // Custom query to get medical records with treatment history containing specific text
     @Query("SELECT mr FROM MedicalRecord mr WHERE mr.treatmentHistory LIKE %:keyword%")
     List<MedicalRecord> findMedicalRecordsByTreatmentHistoryContaining(@Param("keyword") String keyword);
 
-    // Custom query to get latest medical record for each customer
     @Query("SELECT mr FROM MedicalRecord mr WHERE mr.lastUpdated = " +
             "(SELECT MAX(mr2.lastUpdated) FROM MedicalRecord mr2 WHERE mr2.customer.id = mr.customer.id)")
     List<MedicalRecord> findLatestMedicalRecordForEachCustomer();
 
-    // Custom query to get medical records with critical CD4 count (below 200)
     @Query("SELECT mr FROM MedicalRecord mr WHERE mr.cd4Count < 200")
     List<MedicalRecord> findCriticalCd4Records();
 
-    // Custom query to get medical records with undetectable viral load (below 50)
     @Query("SELECT mr FROM MedicalRecord mr WHERE mr.viralLoad < 50")
     List<MedicalRecord> findUndetectableViralLoadRecords();
 

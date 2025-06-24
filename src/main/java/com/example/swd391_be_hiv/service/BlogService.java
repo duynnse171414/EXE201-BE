@@ -26,11 +26,11 @@ public class BlogService {
 
     public BlogResponse createBlog(BlogRequest requestDTO) {
         try {
-            // Validate staff exists
+
             Staff staff = staffRepository.findById(requestDTO.getStaffId())
                     .orElseThrow(() -> new NotFoundException("Staff not found"));
 
-            // Convert DTO to entity
+
             Blog blog = new Blog();
             blog.setTitle(requestDTO.getTitle());
             blog.setStaff(staff);
@@ -58,15 +58,15 @@ public class BlogService {
             throw new NotFoundException("Blog not found");
         }
 
-        // Validate staff if it's being changed
+
         Staff staff = staffRepository.findById(requestDTO.getStaffId())
                 .orElseThrow(() -> new NotFoundException("Staff not found"));
 
-        // Update fields
+
         existingBlog.setTitle(requestDTO.getTitle());
         existingBlog.setStaff(staff);
         existingBlog.setContent(requestDTO.getContent());
-        // Note: createDate is not updated to preserve original creation time
+
 
         Blog updatedBlog = blogRepository.save(existingBlog);
         return convertToResponseDTO(updatedBlog);

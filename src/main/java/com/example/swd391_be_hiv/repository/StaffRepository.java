@@ -25,33 +25,26 @@ public interface StaffRepository extends JpaRepository<Staff, Long> {
 
     List<Staff> findStaffByGenderAndIsDeletedFalse(String gender);
 
-    // Custom query to find staff with education content
     @Query("SELECT DISTINCT s FROM Staff s JOIN s.educationContents ec WHERE ec IS NOT NULL")
     List<Staff> findStaffWithEducationContent();
 
-    // Custom query to find staff with blogs
     @Query("SELECT DISTINCT s FROM Staff s JOIN s.blogs b WHERE b IS NOT NULL")
     List<Staff> findStaffWithBlogs();
 
-    // Custom query to count education content by staff
     @Query("SELECT s, COUNT(ec) FROM Staff s LEFT JOIN s.educationContents ec GROUP BY s")
     List<Object[]> countEducationContentByStaff();
 
-    // Custom query to count blogs by staff
     @Query("SELECT s, COUNT(b) FROM Staff s LEFT JOIN s.blogs b GROUP BY s")
     List<Object[]> countBlogsByStaff();
 
-    // Custom query to find staff by phone number
     @Query("SELECT s FROM Staff s WHERE s.phone = :phone AND s.isDeleted = false")
     Staff findActiveStaffByPhone(@Param("phone") String phone);
 
-    // Custom query to find staff with most education content
     @Query("SELECT s FROM Staff s LEFT JOIN s.educationContents ec " +
             "WHERE s.isDeleted = false " +
             "GROUP BY s ORDER BY COUNT(ec) DESC")
     List<Staff> findStaffOrderByEducationContentCount();
 
-    // Custom query to find staff with most blogs
     @Query("SELECT s FROM Staff s LEFT JOIN s.blogs b " +
             "WHERE s.isDeleted = false " +
             "GROUP BY s ORDER BY COUNT(b) DESC")

@@ -26,11 +26,11 @@ public class EducationContentService {
 
     public EducationContentResponse createEducationContent(EducationContentRequest requestDTO) {
         try {
-            // Validate staff exists
+
             Staff staff = staffRepository.findById(requestDTO.getStaffId())
                     .orElseThrow(() -> new NotFoundException("Staff not found"));
 
-            // Convert DTO to entity
+
             EducationContent educationContent = new EducationContent();
             educationContent.setTitle(requestDTO.getTitle());
             educationContent.setContent(requestDTO.getContent());
@@ -58,15 +58,15 @@ public class EducationContentService {
             throw new NotFoundException("Education content not found");
         }
 
-        // Validate staff if it's being changed
+
         Staff staff = staffRepository.findById(requestDTO.getStaffId())
                 .orElseThrow(() -> new NotFoundException("Staff not found"));
 
-        // Update fields
+
         existingContent.setTitle(requestDTO.getTitle());
         existingContent.setContent(requestDTO.getContent());
         existingContent.setStaff(staff);
-        // Note: createdAt is not updated to preserve original creation time
+
 
         EducationContent updatedContent = educationContentRepository.save(existingContent);
         return convertToResponseDTO(updatedContent);

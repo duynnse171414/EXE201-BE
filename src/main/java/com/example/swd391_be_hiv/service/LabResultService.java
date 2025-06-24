@@ -31,15 +31,15 @@ public class LabResultService {
 
     public LabResultResponse createLabResult(LabResultRequest requestDTO) {
         try {
-            // Validate medical record exists
+
             MedicalRecord medicalRecord = medicalRecordRepository.findById(requestDTO.getMedicalRecordId())
                     .orElseThrow(() -> new NotFoundException("Medical record not found"));
 
-            // Validate doctor exists
+
             Doctor doctor = doctorRepository.findById(requestDTO.getDoctorId())
                     .orElseThrow(() -> new NotFoundException("Doctor not found"));
 
-            // Convert DTO to entity
+
             LabResult labResult = new LabResult();
             labResult.setMedicalRecord(medicalRecord);
             labResult.setDoctorId(requestDTO.getDoctorId());
@@ -69,15 +69,15 @@ public class LabResultService {
             throw new NotFoundException("Lab result not found");
         }
 
-        // Validate medical record if it's being changed
+
         MedicalRecord medicalRecord = medicalRecordRepository.findById(requestDTO.getMedicalRecordId())
                 .orElseThrow(() -> new NotFoundException("Medical record not found"));
 
-        // Validate doctor exists
+
         Doctor doctor = doctorRepository.findById(requestDTO.getDoctorId())
                 .orElseThrow(() -> new NotFoundException("Doctor not found"));
 
-        // Update fields
+
         existingLabResult.setMedicalRecord(medicalRecord);
         existingLabResult.setDoctorId(requestDTO.getDoctorId());
         existingLabResult.setResult(requestDTO.getResult());
@@ -131,12 +131,12 @@ public class LabResultService {
         dto.setTestDate(labResult.getTestDate());
         dto.setNote(labResult.getNote());
 
-        // Get patient name from medical record if customer exists
+
         if (labResult.getMedicalRecord().getCustomer() != null) {
             dto.setPatientName(labResult.getMedicalRecord().getCustomer().getAccount().getFullName());
         }
 
-        // Get doctor name from doctor repository
+
         Doctor doctor = doctorRepository.findById(labResult.getDoctorId()).orElse(null);
         if (doctor != null) {
             dto.setDoctorName(doctor.getName());

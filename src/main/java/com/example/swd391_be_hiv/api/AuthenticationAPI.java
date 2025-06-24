@@ -20,7 +20,7 @@ import java.util.List;
 
 public class AuthenticationAPI {
 
-    // DI: Dependency Injection
+
     @Autowired
     AuthenticationService authenticationService;
 

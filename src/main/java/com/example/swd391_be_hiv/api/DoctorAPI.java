@@ -13,7 +13,7 @@ import java.util.List;
 
 @SecurityRequirement(name = "api")
 @RestController
-@RequestMapping("/api/doctor") // Sửa mapping cho đúng REST convention
+@RequestMapping("/api/doctor") 
 public class DoctorAPI {
 
     @Autowired

@@ -20,12 +20,12 @@ public class StaffService {
 
     public StaffResponse createStaff(StaffRequest requestDTO) {
         try {
-            // Check if email already exists
+
             if (staffRepository.findStaffByEmail(requestDTO.getEmail()) != null) {
                 throw new DuplicateEntity("Email already exists");
             }
 
-            // Convert DTO to entity
+
             Staff staff = new Staff();
             staff.setName(requestDTO.getName());
             staff.setEmail(requestDTO.getEmail());
@@ -70,13 +70,13 @@ public class StaffService {
             throw new NotFoundException("Staff not found");
         }
 
-        // Check if email already exists for other staff
+
         Staff emailExists = staffRepository.findStaffByEmail(requestDTO.getEmail());
         if (emailExists != null && !emailExists.getStaffId().equals(staffId)) {
             throw new DuplicateEntity("Email already exists");
         }
 
-        // Update fields
+
         existingStaff.setName(requestDTO.getName());
         existingStaff.setEmail(requestDTO.getEmail());
         existingStaff.setPhone(requestDTO.getPhone());
@@ -95,7 +95,6 @@ public class StaffService {
             throw new NotFoundException("Staff not found");
         }
 
-        // Soft delete
         staff.setIsDeleted(true);
         Staff deletedStaff = staffRepository.save(staff);
         return convertToResponseDTO(deletedStaff);

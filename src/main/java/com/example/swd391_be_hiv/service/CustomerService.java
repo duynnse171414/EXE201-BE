@@ -21,19 +21,19 @@ public class CustomerService {
 @Autowired
 AccountRepository accountRepository;
 
-    // Lấy tất cả customer
+
     public List<Customer> getAllCustomers() {
         return customerRepository.findAllActive();
     }
 
-    // Lấy customer theo ID
+
     public Optional<Customer> getCustomerById(Long id) {
         return customerRepository.findByIdActive(id);
     }
 
-    // Tạo mới customer với account_id
+
     public Customer createCustomer(Long accountId) {
-        // Tìm account theo ID
+
         Optional<Account> account = accountRepository.findById(accountId);
         if (!account.isPresent()) {
             throw new RuntimeException("Account not found with id: " + accountId);
@@ -65,7 +65,7 @@ AccountRepository accountRepository;
 //        throw new RuntimeException("Customer not found with id: " + id);
 //    }
 
-    // Xóa mềm customer
+
     public void deleteCustomer(Long id) {
         Optional<Customer> customer = customerRepository.findByIdActive(id);
         if (customer.isPresent()) {
@@ -77,7 +77,7 @@ AccountRepository accountRepository;
         }
     }
 
-    // Lấy customer theo account ID
+
     public List<Customer> getCustomersByAccountId(Long accountId) {
         return customerRepository.findByAccountId(accountId);
     }

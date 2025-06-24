@@ -31,14 +31,14 @@ public class MedicalRecordService {
 
     public MedicalRecordResponse createMedicalRecord(MedicalRecordRequest requestDTO) {
         try {
-            // Validate doctor and customer exist
+
             Doctor doctor = doctorRepository.findById(requestDTO.getDoctorId())
                     .orElseThrow(() -> new NotFoundException("Doctor not found"));
 
             Customer customer = customerRepository.findById(requestDTO.getCustomerId())
                     .orElseThrow(() -> new NotFoundException("Customer not found"));
 
-            // Convert DTO to entity
+
             MedicalRecord medicalRecord = new MedicalRecord();
             medicalRecord.setCustomer(customer);
             medicalRecord.setDoctor(doctor);
@@ -68,14 +68,14 @@ public class MedicalRecordService {
             throw new NotFoundException("Medical record not found");
         }
 
-        // Validate doctor and customer if they are being changed
+
         Doctor doctor = doctorRepository.findById(requestDTO.getDoctorId())
                 .orElseThrow(() -> new NotFoundException("Doctor not found"));
 
         Customer customer = customerRepository.findById(requestDTO.getCustomerId())
                 .orElseThrow(() -> new NotFoundException("Customer not found"));
 
-        // Update fields
+
         existingRecord.setCustomer(customer);
         existingRecord.setDoctor(doctor);
         existingRecord.setCd4Count(requestDTO.getCd4Count());

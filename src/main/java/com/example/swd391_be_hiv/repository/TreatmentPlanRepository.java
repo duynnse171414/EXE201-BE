@@ -19,6 +19,5 @@ public interface TreatmentPlanRepository extends JpaRepository<TreatmentPlan, Lo
 
     List<TreatmentPlan> findTreatmentPlansByApplicableGroup(String applicableGroup);
 
-    // Get treatment plans by active doctors only (not deleted)
     List<TreatmentPlan> findTreatmentPlansByDoctor_DeletedFalse();
 }
