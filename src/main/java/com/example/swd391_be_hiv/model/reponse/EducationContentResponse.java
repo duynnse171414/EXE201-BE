@@ -14,5 +14,6 @@ public class EducationContentResponse {
     private String content;
     private Long staffId;
     private String staffName;
+    private String image;
     private LocalDateTime createdAt;
 }

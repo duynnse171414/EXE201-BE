@@ -7,6 +7,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.AccessDeniedException;
+
 @RestControllerAdvice // đánh dấu đây là 1 class để bắt lỗi
 public class ValidationHandler {
 
@@ -29,5 +31,11 @@ public class ValidationHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity handleValidation(Exception exception) {
         return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<String> handleAccessDenied(AccessDeniedException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body("Access denied: Only managers can create staff");
     }
 }

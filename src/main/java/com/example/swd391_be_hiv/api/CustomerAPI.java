@@ -51,17 +51,17 @@ public class CustomerAPI {
 
 
     // POST /api/customers - Tạo mới customer với account_id
-    @PostMapping
-    public ResponseEntity<?> createCustomer(@Valid @RequestBody CustomerRequest request) {
-        try {
-            Customer createdCustomer = customerService.createCustomer(request.getAccountId());
-            return ResponseEntity.status(HttpStatus.CREATED).body(new CreateCustomerResponse("Customer created successfully", true, createdCustomer));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(e.getMessage(), false));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("Error occurred while creating customer", false));
-        }
-    }
+//    @PostMapping
+//    public ResponseEntity<?> createCustomer(@Valid @RequestBody CustomerRequest request) {
+//        try {
+//            Customer createdCustomer = customerService.createCustomer(request.getAccountId());
+//            return ResponseEntity.status(HttpStatus.CREATED).body(new CreateCustomerResponse("Customer created successfully", true, createdCustomer));
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(e.getMessage(), false));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("Error occurred while creating customer", false));
+//        }
+//    }
     // PUT /api/customers/{id} - Cập nhật customer
 //    @PutMapping("/{id}")
 //    public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {

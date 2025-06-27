@@ -20,4 +20,6 @@ public class EducationContentRequest {
 
     @NotNull(message = "Staff ID is required")
     private Long staffId;
+
+    private String image;
 }

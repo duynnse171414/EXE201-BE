@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,10 +43,11 @@ public class AuthenticationService implements UserDetailsService {
     @Autowired
     TokenService tokenService;
 
+    @Autowired
+    CustomerService customerService; // Inject CustomerService
 
     private Map<String, String> otpStore = new HashMap<>();
     private Map<String, Long> otpExpirationStore = new HashMap<>();
-
 
     private static final long OTP_EXPIRATION_TIME = 300000; // in milliseconds
 
@@ -53,16 +55,14 @@ public class AuthenticationService implements UserDetailsService {
         return expirationTime == null || System.currentTimeMillis() > expirationTime;
     }
 
-
+    @Transactional
     public AccountResponse register(RegisterRequest registerRequest) {
 
         Account account = modelMapper.map(registerRequest, Account.class);
 
-
         if (!account.getGender().equals("Male") && !account.getGender().equals("Female")) {
             throw new IllegalArgumentException("Not Valid Gender!");
         }
-
 
         if (accountRepository.findAccountByPhone(account.getPhone()) != null) {
             throw new DuplicateEntity("Duplicate phone!");
@@ -73,13 +73,14 @@ public class AuthenticationService implements UserDetailsService {
         }
 
         try {
-
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));
 
-
+            // Save account first
             Account newAccount = accountRepository.save(account);
 
+            // Automatically create customer for the new account
+            customerService.createCustomer(newAccount.getId());
 
             return modelMapper.map(newAccount, AccountResponse.class);
         } catch (Exception e) {

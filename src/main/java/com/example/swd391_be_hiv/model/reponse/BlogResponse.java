@@ -14,5 +14,6 @@ public class BlogResponse {
     private Long staffId;
     private String staffName;
     private String content;
+    private String image;
     private LocalDateTime createDate;
 }

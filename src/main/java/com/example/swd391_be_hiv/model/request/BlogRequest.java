@@ -20,4 +20,6 @@ public class BlogRequest {
     @NotBlank(message = "Content is required")
     @Size(min = 10, message = "Content must be at least 10 characters long")
     private String content;
+
+    private String image;
 }

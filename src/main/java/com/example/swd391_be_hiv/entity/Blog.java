@@ -20,6 +20,9 @@ public class Blog {
     @Column(name = "Title")
      String title;
 
+    @Column(name = "Image")
+    String image;
+
     @ManyToOne
     @JoinColumn(name = "Staff_ID")
      Staff staff;

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +19,6 @@ public class StaffAPI {
 
     @Autowired
     StaffService staffService;
-
     @PostMapping
     public ResponseEntity<StaffResponse> createStaff(@Valid @RequestBody StaffRequest requestDTO) {
         StaffResponse response = staffService.createStaff(requestDTO);

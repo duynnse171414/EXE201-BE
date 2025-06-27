@@ -34,6 +34,7 @@ public class EducationContentService {
             EducationContent educationContent = new EducationContent();
             educationContent.setTitle(requestDTO.getTitle());
             educationContent.setContent(requestDTO.getContent());
+            educationContent.setImage(requestDTO.getImage());
             educationContent.setStaff(staff);
             educationContent.setCreatedAt(LocalDateTime.now());
 
@@ -65,6 +66,7 @@ public class EducationContentService {
 
         existingContent.setTitle(requestDTO.getTitle());
         existingContent.setContent(requestDTO.getContent());
+        existingContent.setImage(requestDTO.getImage());
         existingContent.setStaff(staff);
 
 

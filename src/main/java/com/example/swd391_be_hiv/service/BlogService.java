@@ -35,6 +35,7 @@ public class BlogService {
             blog.setTitle(requestDTO.getTitle());
             blog.setStaff(staff);
             blog.setContent(requestDTO.getContent());
+            blog.setImage(requestDTO.getImage());
             blog.setCreateDate(LocalDateTime.now());
 
             Blog savedBlog = blogRepository.save(blog);
@@ -65,6 +66,7 @@ public class BlogService {
 
         existingBlog.setTitle(requestDTO.getTitle());
         existingBlog.setStaff(staff);
+        existingBlog.setImage(requestDTO.getImage());
         existingBlog.setContent(requestDTO.getContent());
 
 

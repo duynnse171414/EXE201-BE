@@ -22,6 +22,9 @@ public class EducationContent {
     @Column(name = "Content", columnDefinition = "TEXT")
      String content;
 
+    @Column(name = "Image")
+    String image;
+
     @ManyToOne
     @JoinColumn(name = "Staff_ID")
      Staff staff;
