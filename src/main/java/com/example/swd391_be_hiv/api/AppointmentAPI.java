@@ -1,12 +1,9 @@
 package com.example.swd391_be_hiv.api;
 
-
 import com.example.swd391_be_hiv.model.request.AppointmentRequest;
+import com.example.swd391_be_hiv.model.request.UpdateStatusRequest;
 import com.example.swd391_be_hiv.model.reponse.AppointmentResponse;
 import com.example.swd391_be_hiv.model.reponse.AppointmentDetailResponse;
-import com.example.swd391_be_hiv.repository.AppointmentRepository;
-import com.example.swd391_be_hiv.repository.CustomerRepository;
-import com.example.swd391_be_hiv.repository.DoctorRepository;
 import com.example.swd391_be_hiv.service.AppointmentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +20,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("api/appointment")
 public class AppointmentAPI {
-
 
     @Autowired
     private AppointmentService appointmentService;
@@ -190,10 +186,7 @@ public class AppointmentAPI {
         }
     }
 
-    /**
-     * GET /api/appointment/{appointmentId}
-     * Lấy chi tiết appointment theo ID
-     */
+
     @GetMapping("/{appointmentId}")
     public ResponseEntity<Map<String, Object>> getAppointmentDetail(@PathVariable Long appointmentId) {
         try {
@@ -224,10 +217,7 @@ public class AppointmentAPI {
         }
     }
 
-    /**
-     * GET /api/appointment/status/{status}
-     * Lấy appointments theo status
-     */
+
     @GetMapping("/status/{status}")
     public ResponseEntity<Map<String, Object>> getAppointmentsByStatus(@PathVariable String status) {
         try {
@@ -255,6 +245,41 @@ public class AppointmentAPI {
             errorResponse.put("success", false);
             errorResponse.put("message", "Có lỗi xảy ra khi lấy danh sách appointments");
             errorResponse.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+
+    @PutMapping("/{appointmentId}/status")
+    public ResponseEntity<Map<String, Object>> updateAppointmentStatus(
+            @PathVariable Long appointmentId,
+            @RequestBody UpdateStatusRequest request) {
+        try {
+            String result = appointmentService.updateAppointmentStatus(appointmentId, request);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", result);
+            response.put("appointmentId", appointmentId);
+            response.put("newStatus", request.getStatus());
+
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            errorResponse.put("appointmentId", appointmentId);
+
+            return ResponseEntity.badRequest().body(errorResponse);
+
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "Có lỗi xảy ra khi cập nhật trạng thái appointment");
+            errorResponse.put("error", e.getMessage());
+            errorResponse.put("appointmentId", appointmentId);
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
