@@ -11,5 +11,6 @@ public class AccountResponse {
     String phone;
     String role;
     String token;
+    Long customerId;
 
 }

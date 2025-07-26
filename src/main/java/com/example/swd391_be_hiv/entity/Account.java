@@ -85,6 +85,6 @@ public class Account implements UserDetails {
         return this.password;
     }
 
-    @OneToMany(mappedBy = "account")
-    List<Customer> customers;
+    @OneToOne(mappedBy = "account")
+    Customer customer;
 }

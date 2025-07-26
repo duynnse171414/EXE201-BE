@@ -18,7 +18,7 @@ public class Customer {
     @Column(name = "is_deleted")
      boolean isDeleted = false ;
 
-    @ManyToOne
+    @OneToOne  // Thay đổi từ @ManyToOne thành @OneToOne
     @JoinColumn(name = "account_id")
     @JsonIgnore
     Account account;

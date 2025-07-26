@@ -1,6 +1,6 @@
 package com.example.swd391_be_hiv.api;
 
-
+import com.example.swd391_be_hiv.entity.Account;
 import com.example.swd391_be_hiv.model.reponse.AccountResponse;
 import com.example.swd391_be_hiv.model.request.LoginRequest;
 import com.example.swd391_be_hiv.model.request.RegisterRequest;
@@ -14,12 +14,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @SecurityRequirement(name = "api")
 @RestController
 @RequestMapping("api")
-
 public class AuthenticationAPI {
-
 
     @Autowired
     AuthenticationService authenticationService;
@@ -34,5 +33,11 @@ public class AuthenticationAPI {
     public ResponseEntity login(@Valid @RequestBody LoginRequest loginRequest) {
         AccountResponse newAccount = authenticationService.login(loginRequest);
         return ResponseEntity.ok(newAccount);
+    }
+
+    @GetMapping("accounts")
+    public ResponseEntity<List<Account>> getAllAccounts() {
+        List<Account> accounts = authenticationService.getAllAccount();
+        return ResponseEntity.ok(accounts);
     }
 }
