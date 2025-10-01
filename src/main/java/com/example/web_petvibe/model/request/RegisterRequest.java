@@ -13,14 +13,14 @@ import lombok.Data;
 
 @Data
 public class RegisterRequest {
-    @NotBlank
+//    @NotBlank
     String fullName;
 
-    @NotBlank(message = "Code can not be blank!")
-    @Pattern(regexp = "^(Male|Female)$", message = ("Invalid Gender"))
-    String Gender;
+//    @NotBlank(message = "Code can not be blank!")
+//    @Pattern(regexp = "^(Male|Female)$", message = ("Invalid Gender"))
+//    String Gender;
 
-    @Email(message = "Invalid Email!")
+//    @Email(message = "Invalid Email!")
     @Column(unique = true)
     String email;
 
@@ -33,4 +33,12 @@ public class RegisterRequest {
 
     @Enumerated(EnumType.STRING)
     Role role;
+
+    String petName;
+
+    String petAge;
+
+    String petType;
+
+    String petSize;
 }

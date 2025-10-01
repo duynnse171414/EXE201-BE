@@ -57,17 +57,17 @@ public class AuthenticationService implements UserDetailsService {
 
         Account account = modelMapper.map(registerRequest, Account.class);
 
-        if (!account.getGender().equals("Male") && !account.getGender().equals("Female")) {
-            throw new IllegalArgumentException("Not Valid Gender!");
-        }
+//        if (!account.getGender().equals("Male") && !account.getGender().equals("Female")) {
+//            throw new IllegalArgumentException("Not Valid Gender!");
+//        }
 
         if (accountRepository.findAccountByPhone(account.getPhone()) != null) {
             throw new DuplicateEntity("Duplicate phone!");
         }
 
-        if (accountRepository.findByEmail(account.getEmail()) != null) {
-            throw new DuplicateEntity("Duplicate Email!");
-        }
+//        if (accountRepository.findByEmail(account.getEmail()) != null) {
+//            throw new DuplicateEntity("Duplicate Email!");
+//        }
 
         try {
             String originPassword = account.getPassword();
@@ -98,7 +98,7 @@ public class AuthenticationService implements UserDetailsService {
     public AccountResponse login(LoginRequest loginRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    loginRequest.getUsername(),
+                    loginRequest.getPhone(),
                     loginRequest.getPassword()
             ));
             Account account = (Account) authentication.getPrincipal();

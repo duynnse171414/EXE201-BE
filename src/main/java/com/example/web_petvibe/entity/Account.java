@@ -29,14 +29,14 @@ public class Account implements UserDetails {
     // kh trả về và kh bắt user nhập thông tin
     boolean deleted = false; //false = not deleted - Đổi tên từ isDeleted thành deleted
 
-    @NotBlank
+//    @NotBlank
     String fullName;
 
-    @NotBlank(message = "Gender can not be blank!")
-    @Pattern(regexp = "^(Male|Female)$", message = ("Invalid Gender"))
-    String gender; // Đổi từ Gender thành gender (lowercase)
+//    @NotBlank(message = "Gender can not be blank!")
+//    @Pattern(regexp = "^(Male|Female)$", message = ("Invalid Gender"))
+//    String gender; // Đổi từ Gender thành gender (lowercase)
 
-    @Email(message = "Invalid Email!")
+//    @Email(message = "Invalid Email!")
     @Column(unique = true)
     String email;
 
@@ -46,6 +46,14 @@ public class Account implements UserDetails {
 
     @Size(min = 6, message = "Password must be at least 6 character!")
     String password;
+
+    String petName;
+
+    String petAge;
+
+    String petType;
+
+    String petSize;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

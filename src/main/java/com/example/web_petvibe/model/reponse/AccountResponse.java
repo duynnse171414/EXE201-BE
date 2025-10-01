@@ -10,6 +10,10 @@ public class AccountResponse {
     String email;
     String phone;
     String role;
+    String petAge;
+    String petName;
+    String petSize;
+    String petType;
     String token;
     Long customerId;
 
