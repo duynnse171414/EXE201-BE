@@ -1,4 +1,4 @@
-package com.example.web_petvibe.model.reponse;
+package com.example.web_petvibe.model.response;
 
 import lombok.Data;
 
