@@ -8,11 +8,13 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     // lấy account bằng phone
     Account findAccountByPhone(String phone);
 
+    Account findAccountByEmail(String email);
+
     //Account findByUsername(String username);
 
-Account findByEmail(String email);
-
-    Account findAccountById(Long id);
-
+//Account findByEmail(String email);
+//
+Account findAccountById(Long id);
+//
 
 }

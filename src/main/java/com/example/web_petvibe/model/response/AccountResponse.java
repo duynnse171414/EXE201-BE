@@ -1,4 +1,4 @@
-package com.example.web_petvibe.model.reponse;
+package com.example.web_petvibe.model.response;
 
 import lombok.Data;
 
@@ -10,6 +10,10 @@ public class AccountResponse {
     String email;
     String phone;
     String role;
+    String petAge;
+    String petName;
+    String petSize;
+    String petType;
     String token;
     Long customerId;
 
