@@ -1,29 +1,14 @@
-# =========================
-# 1️⃣ Build Stage
-# =========================
-FROM eclipse-temurin:17-jdk AS builder
-
+# ---- Build ----
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
-
-# Copy toàn bộ project vào container
 COPY . .
+RUN mvn -q -DskipTests package
 
-# Cấp quyền thực thi cho mvnw (nếu có)
-RUN chmod +x mvnw
-
-# Build file jar, bỏ qua test
-RUN ./mvnw clean package -DskipTests
-
-
-# =========================
-# 2️⃣ Run Stage
-# =========================
-FROM eclipse-temurin:17-jdk
-
+# ---- Run ----
+FROM eclipse-temurin:17-jre
 WORKDIR /app
-
-# Copy file jar từ build stage
-COPY --from=builder /app/target/*.jar app.jar
-
-# Render tự truyền biến PORT → Spring Boot nhận qua --server.port=$PORT
-CMD ["sh", "-c", "java -jar app.jar --server.port=$PORT"]
+COPY --from=build /app/target/*.jar app.jar
+# Render sẽ set env PORT khi chạy -> truyền vào Spring Boot qua --server.port
+ENV JAVA_OPTS="-Xms256m -Xmx512m"
+ENV SPRING_PROFILES_ACTIVE=prod
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar app.jar --server.port=${PORT:-8080}"]
