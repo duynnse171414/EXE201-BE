@@ -1,5 +1,6 @@
 package com.example.web_petvibe.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,6 +36,10 @@ public class ChatHistory {
     @Enumerated(EnumType.STRING)
     @Column(name = "chat_type", nullable = false)
     private ChatType chatType;
+
+    @JsonIgnore
+    @Column(name = "is_deleted")
+    boolean isDeleted = false;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
