@@ -34,6 +34,7 @@ public class OrderService {
         order.setAccount(account);
         order.setShippingAddress(request.getShippingAddress());
         order.setPhoneContact(request.getPhoneContact());
+        order.setNote(request.getNote());
 
         List<OrderDetails> items = new ArrayList<>();
         double total = 0;

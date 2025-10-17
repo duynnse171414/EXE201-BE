@@ -11,6 +11,7 @@ public class OrderRequest {
     private Long accountId;
     private String shippingAddress;
     private String phoneContact;
+    private String note;
     private List<OrderDetailsRequest> items;
 
     @Getter

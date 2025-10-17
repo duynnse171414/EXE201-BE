@@ -34,6 +34,8 @@ public class Order {
 
     private String shippingAddress;
 
+    private String note;
+
     private String phoneContact;
     @CreationTimestamp // Hibernate tự động set khi insert
     private LocalDateTime createdAt;
