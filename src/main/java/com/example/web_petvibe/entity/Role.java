@@ -8,5 +8,5 @@ public enum Role {
 
     MANAGER,
 
-    DOCTOR
+    ADMIN
 }

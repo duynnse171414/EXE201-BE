@@ -15,6 +15,7 @@ public class OrderResponse {
     private Double totalAmount;
     private LocalDateTime createdAt;
     private String accountName;
+    private String note;
     private List<OrderItemResponse> items;
 
     @Getter
