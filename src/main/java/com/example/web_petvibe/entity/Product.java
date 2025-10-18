@@ -25,6 +25,9 @@ public class Product {
     @Column(nullable = false)
     Integer stock;
 
+    @Column(name = "image_url", length = 1000)
+    String imageUrl;
+
     @JsonIgnore
     @Column(name = "is_deleted")
     boolean isDeleted = false;

@@ -25,6 +25,8 @@ public class ProductRequest {
     @Min(value = 0, message = "Stock must be >= 0")
     private Integer stock;
 
+    String imageUrl;
+
     @NotNull(message = "CategoryId is required")
     private Long categoryId;
 }

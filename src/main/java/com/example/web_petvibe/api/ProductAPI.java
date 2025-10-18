@@ -45,13 +45,14 @@ public class ProductAPI {
                             p.getName(),
                             p.getDescription(),
                             p.getPrice(),
+                            p.getImageUrl(),
                             p.getStock(),
                             p.getCategory()
                     )
             );
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse("Product not found with id: " + id, false));
+                    .body(new ApiResponse("Product not found", false));
         }
     }
 

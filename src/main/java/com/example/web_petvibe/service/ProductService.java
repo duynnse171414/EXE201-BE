@@ -88,6 +88,9 @@ public class ProductService {
         if (updatedProduct.getStock() != null) {
             product.setStock(updatedProduct.getStock());
         }
+        if (updatedProduct.getImageUrl() != null) {
+            product.setImageUrl(updatedProduct.getImageUrl());
+        }
 
         return productRepository.save(product);
     }
