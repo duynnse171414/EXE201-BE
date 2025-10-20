@@ -20,6 +20,9 @@ public class OrderResponse {
     private String note;
     private List<OrderItemResponse> items;
 
+    // Thông tin thanh toán QR
+    private PaymentInfoResponse paymentInfo;
+
     @Getter
     @Setter
     public static class OrderItemResponse {
@@ -27,5 +30,17 @@ public class OrderResponse {
         private String productName;
         private Integer quantity;
         private Double price;
+    }
+
+    @Getter
+    @Setter
+    public static class PaymentInfoResponse {
+        private String qrCodeUrl;
+        private String bankId;
+        private String accountNo;
+        private String accountName;
+        private Double amount;
+        private String description;
+        private String message; // Hướng dẫn thanh toán
     }
 }

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class PetProfileAPI {
     private PetProfileService petProfileService;
 
     // GET all pet profiles (cho admin)
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/getAll")
     public ResponseEntity<List<PetProfile>> getAllPetProfiles() {
         try {
@@ -54,6 +56,7 @@ public class PetProfileAPI {
     }
 
     // GET pet profiles by user id (cho admin)
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<PetProfile>> getPetProfilesByUserId(@PathVariable Long userId) {
         try {

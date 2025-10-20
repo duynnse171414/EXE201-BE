@@ -1,13 +1,11 @@
 package com.example.web_petvibe.service;
 
 import com.example.web_petvibe.entity.Account;
+import com.example.web_petvibe.entity.Role;
 import com.example.web_petvibe.exception.DuplicateEntity;
 import com.example.web_petvibe.exception.NotFoundException;
+import com.example.web_petvibe.model.request.*;
 import com.example.web_petvibe.model.response.AccountResponse;
-import com.example.web_petvibe.model.request.LoginRequest;
-import com.example.web_petvibe.model.request.RegisterRequest;
-import com.example.web_petvibe.model.request.ResetPasswordRequest;
-import com.example.web_petvibe.model.request.UpdateAccountRequest;
 import com.example.web_petvibe.repository.AccountRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -200,6 +198,36 @@ public class AuthenticationService implements UserDetailsService {
         // Encode password mới
         user.setPassword(passwordEncoder.encode(newPassword));
         accountRepository.save(user);
+    }
+
+    @Transactional
+    public AccountResponse createStaffAccount(CreateStaffRequest request) {
+        // Kiểm tra xem phone đã tồn tại chưa
+        if (accountRepository.findAccountByPhone(request.getPhone()) != null) {
+            throw new DuplicateEntity("Phone number already exists!");
+        }
+
+        // Kiểm tra email nếu có
+        if (request.getEmail() != null && !request.getEmail().isEmpty()) {
+            if (accountRepository.findAccountByEmail(request.getEmail()) != null) {
+                throw new DuplicateEntity("Email already exists!");
+            }
+        }
+
+        try {
+            Account account = new Account();
+            account.setFullName(request.getFullName());
+            account.setPhone(request.getPhone());
+            account.setEmail(request.getEmail());
+            account.setPassword(passwordEncoder.encode(request.getPassword()));
+            account.setRole(Role.STAFF);
+            account.setDeleted(false);
+
+            Account newAccount = accountRepository.save(account);
+            return modelMapper.map(newAccount, AccountResponse.class);
+        } catch (Exception e) {
+            throw new RuntimeException("An unexpected error occurred: " + e.getMessage());
+        }
     }
 
 

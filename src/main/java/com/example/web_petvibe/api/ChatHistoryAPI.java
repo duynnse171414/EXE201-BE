@@ -28,7 +28,6 @@ public class ChatHistoryAPI {
 
     // POST chat with AI - Customer only
     @PostMapping("/chat")
-    @PreAuthorize("hasAuthority('CUSTOMER')")
     @Operation(summary = "Chat với AI trợ lý PetVibe",
             description = "Sử dụng Google Gemini để chat và tự động lưu lịch sử")
     public ResponseEntity<?> chatWithAI(@RequestBody ChatHistoryRequest request) {

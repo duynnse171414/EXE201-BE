@@ -4,9 +4,9 @@ import com.example.web_petvibe.config.OrderMapper;
 import com.example.web_petvibe.entity.Order;
 import com.example.web_petvibe.model.request.OrderRequest;
 import com.example.web_petvibe.model.request.UpdateOrderStatusRequest;
-import com.example.web_petvibe.model.response.ApiResponse;
 import com.example.web_petvibe.model.response.OrderResponse;
 import com.example.web_petvibe.service.OrderService;
+import com.example.web_petvibe.service.QRPaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,19 +26,51 @@ public class OrderAPI {
     private OrderService orderService;
 
     @Autowired
-    OrderMapper orderMapper;
+    private OrderMapper orderMapper;
 
-    // Tạo đơn hàng - User đã đăng nhập
-    @PostMapping("/orders")
+    @Autowired
+    private QRPaymentService qrPaymentService;
+
+    // Tạo đơn hàng - Trả về kèm QR code thanh toán
+    @PostMapping
+    @Operation(summary = "Create new order with payment QR code")
     public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest request) {
+        // Tạo order
         Order order = orderService.createOrder(request);
-        OrderResponse response = orderMapper.toResponse(order);
+
+        // Tạo QR payment info (chỉ khi order PENDING)
+        QRPaymentService.PaymentInfo paymentInfo = null;
+        if ("PENDING".equals(order.getStatus())) {
+            paymentInfo = qrPaymentService.generatePaymentInfo(order.getId(), order.getTotalAmount());
+        }
+
+        // Map sang response với payment info
+        OrderResponse response = orderMapper.toResponseWithPayment(order, paymentInfo);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // Lấy danh sách đơn hàng theo user - Chỉ user đó hoặc admin
-    @GetMapping("/orders/account/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @orderService.isOrderOwner(#id)")
+    // Lấy QR code thanh toán cho order đã tạo
+    @GetMapping("/{orderId}/payment-qr")
+    @Operation(summary = "Get payment QR code for existing order")
+    public ResponseEntity<?> getPaymentQR(@PathVariable Long orderId) {
+        Order order = orderService.getOrderById(orderId);
+
+        // Chỉ có thể lấy QR khi order đang PENDING
+        if (!"PENDING".equals(order.getStatus())) {
+            return ResponseEntity.badRequest()
+                    .body("Cannot generate QR code. Order status is: " + order.getStatus());
+        }
+
+        QRPaymentService.PaymentInfo paymentInfo =
+                qrPaymentService.generatePaymentInfo(order.getId(), order.getTotalAmount());
+
+        return ResponseEntity.ok(paymentInfo);
+    }
+
+    // Lấy danh sách đơn hàng theo user
+    @GetMapping("/account/{id}")
+    @Operation(summary = "Get orders by account ID")
     public ResponseEntity<List<OrderResponse>> getOrdersByAccountId(@PathVariable Long id) {
         List<Order> orders = orderService.getOrdersByAccount(id);
         List<OrderResponse> responses = orders.stream()
@@ -47,18 +79,19 @@ public class OrderAPI {
         return ResponseEntity.ok(responses);
     }
 
-    // Lấy chi tiết đơn hàng - Chỉ owner hoặc admin
+    // Lấy chi tiết đơn hàng
     @GetMapping("/{orderId}")
+    @Operation(summary = "Get order details by ID")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long orderId) {
         Order order = orderService.getOrderById(orderId);
         OrderResponse response = orderMapper.toResponse(order);
         return ResponseEntity.ok(response);
     }
 
-    // Cập nhật trạng thái đơn hàng - Chỉ Admin
+    // Cập nhật trạng thái đơn hàng - Chỉ Admin/Staff
     @PatchMapping("/{orderId}/status")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Update order status (Admin only)", description = "Valid statuses: PENDING, PAID, SHIPPED, DELIVERED, CANCELLED")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @Operation(summary = "Update order status (Admin/Staff only)")
     public ResponseEntity<OrderResponse> updateOrderStatus(
             @PathVariable Long orderId,
             @RequestBody UpdateOrderStatusRequest request) {
@@ -67,7 +100,7 @@ public class OrderAPI {
         return ResponseEntity.ok(response);
     }
 
-    // Hủy đơn hàng - Owner hoặc Admin
+    // Hủy đơn hàng
     @PatchMapping("/{orderId}/cancel")
     @Operation(summary = "Cancel order")
     public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long orderId) {
@@ -76,10 +109,10 @@ public class OrderAPI {
         return ResponseEntity.ok(response);
     }
 
-    // Lấy tất cả đơn hàng - Chỉ Admin
+    // Lấy tất cả đơn hàng - Chỉ Admin/Staff
     @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Get all orders (Admin only)")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @Operation(summary = "Get all orders (Admin/Staff only)")
     public ResponseEntity<List<OrderResponse>> getAllOrders() {
         List<Order> orders = orderService.getAllOrders();
         List<OrderResponse> responses = orders.stream()
@@ -88,10 +121,10 @@ public class OrderAPI {
         return ResponseEntity.ok(responses);
     }
 
-    // Lấy đơn hàng theo status - Chỉ Admin
+    // Lấy đơn hàng theo status - Chỉ Admin/Staff
     @GetMapping("/status/{status}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Get orders by status (Admin only)")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @Operation(summary = "Get orders by status (Admin/Staff only)")
     public ResponseEntity<List<OrderResponse>> getOrdersByStatus(@PathVariable String status) {
         List<Order> orders = orderService.getOrdersByStatus(status);
         List<OrderResponse> responses = orders.stream()

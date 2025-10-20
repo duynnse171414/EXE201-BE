@@ -6,7 +6,5 @@ public enum Role {
 
     STAFF,
 
-    MANAGER,
-
     ADMIN
 }

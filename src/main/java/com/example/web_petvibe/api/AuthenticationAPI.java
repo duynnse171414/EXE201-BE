@@ -3,11 +3,8 @@ package com.example.web_petvibe.api;
 import com.example.web_petvibe.entity.Account;
 import com.example.web_petvibe.exception.DuplicateEntity;
 import com.example.web_petvibe.exception.NotFoundException;
+import com.example.web_petvibe.model.request.*;
 import com.example.web_petvibe.model.response.AccountResponse;
-import com.example.web_petvibe.model.request.LoginRequest;
-import com.example.web_petvibe.model.request.RegisterRequest;
-import com.example.web_petvibe.model.request.ResetPasswordRequest;
-import com.example.web_petvibe.model.request.UpdateAccountRequest;
 import com.example.web_petvibe.repository.AccountRepository;
 import com.example.web_petvibe.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -15,6 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +29,19 @@ public class AuthenticationAPI {
     @Autowired
     AccountRepository accountRepository;
 
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/create-staff")
+    public ResponseEntity<?> createStaffAccount(@Valid @RequestBody CreateStaffRequest request) {
+        try {
+            AccountResponse newStaff = authenticationService.createStaffAccount(request);
+            return ResponseEntity.ok(newStaff);
+        } catch (DuplicateEntity e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error occurred while creating staff account");
+        }
+    }
+
     @PostMapping("register")
     public ResponseEntity register(@Valid @RequestBody RegisterRequest registerRequest) {
         AccountResponse newAccount = authenticationService.register(registerRequest);
@@ -43,6 +54,7 @@ public class AuthenticationAPI {
         return ResponseEntity.ok(newAccount);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("accounts")
     public ResponseEntity<List<Account>> getAllAccounts() {
         List<Account> accounts = authenticationService.getAllAccount();
@@ -62,7 +74,7 @@ public class AuthenticationAPI {
             return ResponseEntity.status(500).body("Error occurred while updating account");
         }
     }
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
         try {
@@ -76,6 +88,7 @@ public class AuthenticationAPI {
     }
 
     //  Restore account
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}/restore")
     public ResponseEntity<?> restoreAccount(@PathVariable Long id) {
         try {
