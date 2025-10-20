@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +26,9 @@ public class ChatHistoryAPI {
     @Autowired
     private ChatHistoryService chatHistoryService;
 
-    // POST chat with AI
+    // POST chat with AI - Customer only
     @PostMapping("/chat")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
     @Operation(summary = "Chat với AI trợ lý PetVibe",
             description = "Sử dụng Google Gemini để chat và tự động lưu lịch sử")
     public ResponseEntity<?> chatWithAI(@RequestBody ChatHistoryRequest request) {
@@ -63,8 +65,9 @@ public class ChatHistoryAPI {
         }
     }
 
-    // GET all chat history
+    // GET all chat history - Admin and Staff only
     @GetMapping("/getAll")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     @Operation(summary = "Lấy tất cả lịch sử chat")
     public ResponseEntity<List<ChatHistory>> getAllChatHistory() {
         try {
@@ -74,8 +77,9 @@ public class ChatHistoryAPI {
         }
     }
 
-    // GET chat history by id
+    // GET chat history by id - All authenticated users
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'CUSTOMER')")
     @Operation(summary = "Lấy lịch sử chat theo ID")
     public ResponseEntity<?> getChatHistoryById(@PathVariable Long id) {
         Optional<ChatHistory> chatHistory = chatHistoryService.getChatHistoryById(id);
@@ -84,8 +88,9 @@ public class ChatHistoryAPI {
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Chat history not found with id: " + id, false));
     }
 
-    // GET chat history by user id
+    // GET chat history by user id - Customer (own data) or Admin/Staff (any user)
     @GetMapping("/user/{userId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'CUSTOMER')")
     @Operation(summary = "Lấy lịch sử chat theo User ID")
     public ResponseEntity<?> getChatHistoryByUserId(@PathVariable Long userId) {
         try {
@@ -97,8 +102,9 @@ public class ChatHistoryAPI {
         }
     }
 
-    // GET chat history by user id and chat type
+    // GET chat history by user id and chat type - Customer (own data) or Admin/Staff (any user)
     @GetMapping("/user/{userId}/type/{chatType}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'CUSTOMER')")
     @Operation(summary = "Lấy lịch sử chat theo User ID và Chat Type")
     public ResponseEntity<?> getChatHistoryByUserIdAndType(
             @PathVariable Long userId,
@@ -112,8 +118,9 @@ public class ChatHistoryAPI {
         }
     }
 
-    // GET chat history by chat type
+    // GET chat history by chat type - Admin and Staff only
     @GetMapping("/type/{chatType}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     @Operation(summary = "Lấy lịch sử chat theo Chat Type")
     public ResponseEntity<?> getChatHistoryByType(@PathVariable ChatHistory.ChatType chatType) {
         try {
@@ -125,8 +132,9 @@ public class ChatHistoryAPI {
         }
     }
 
-    // GET count chats by user
+    // GET count chats by user - All authenticated users
     @GetMapping("/user/{userId}/count")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'CUSTOMER')")
     @Operation(summary = "Đếm số lượng chat của user")
     public ResponseEntity<?> countChatsByUserId(@PathVariable Long userId) {
         try {
@@ -138,8 +146,9 @@ public class ChatHistoryAPI {
         }
     }
 
-    // POST create chat history (manual)
+    // POST create chat history (manual) - Admin and Staff only
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     @Operation(summary = "Tạo lịch sử chat thủ công (không dùng AI)")
     public ResponseEntity<?> createChatHistory(@RequestBody ChatHistory chatHistory) {
         try {
@@ -152,8 +161,9 @@ public class ChatHistoryAPI {
         }
     }
 
-    // PUT update chat history
+    // PUT update chat history - Admin and Staff only
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     @Operation(summary = "Cập nhật lịch sử chat")
     public ResponseEntity<?> updateChatHistory(@PathVariable Long id, @RequestBody ChatHistory chatHistory) {
         try {
@@ -165,8 +175,9 @@ public class ChatHistoryAPI {
         }
     }
 
-    // DELETE chat history
+    // DELETE chat history - Admin only
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Xóa lịch sử chat")
     public ResponseEntity<?> deleteChatHistory(@PathVariable Long id) {
         try {

@@ -24,6 +24,7 @@ public class Account implements UserDetails {
     long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     Role role;
 
     // kh trả về và kh bắt user nhập thông tin

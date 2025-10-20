@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +26,9 @@ public class AiImageAnalysisAPI {
     @Autowired
     private AiImageAnalysisService aiImageAnalysisService;
 
-    // POST analyze image with AI
+    // POST analyze image with AI - Customer only
     @PostMapping("/analyze")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
     @Operation(summary = "Phân tích hình ảnh thú cưng bằng AI",
             description = "Sử dụng OpenAI Vision để phân tích hình ảnh và đưa ra khuyến nghị")
     public ResponseEntity<?> analyzeImage(@RequestBody AnalyzeImageRequest request) {
@@ -62,8 +64,9 @@ public class AiImageAnalysisAPI {
         }
     }
 
-    // GET all analyses
+    // GET all analyses - Admin and Staff only
     @GetMapping("/getAll")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     @Operation(summary = "Lấy tất cả phân tích")
     public ResponseEntity<List<AiImageAnalysis>> getAllAnalyses() {
         try {
@@ -73,8 +76,9 @@ public class AiImageAnalysisAPI {
         }
     }
 
-    // GET analysis by id
+    // GET analysis by id - All authenticated users
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'CUSTOMER')")
     @Operation(summary = "Lấy phân tích theo ID")
     public ResponseEntity<?> getAnalysisById(@PathVariable Long id) {
         Optional<AiImageAnalysis> analysis = aiImageAnalysisService.getAnalysisById(id);
@@ -83,8 +87,9 @@ public class AiImageAnalysisAPI {
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Analysis not found with id: " + id, false));
     }
 
-    // GET analyses by user id
+    // GET analyses by user id - Customer (own data) or Admin/Staff (any user)
     @GetMapping("/user/{userId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'CUSTOMER')")
     @Operation(summary = "Lấy phân tích theo User ID")
     public ResponseEntity<?> getAnalysesByUserId(@PathVariable Long userId) {
         try {
@@ -96,8 +101,9 @@ public class AiImageAnalysisAPI {
         }
     }
 
-    // GET analyses by pet id
+    // GET analyses by pet id - All authenticated users
     @GetMapping("/pet/{petId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'CUSTOMER')")
     @Operation(summary = "Lấy phân tích theo Pet ID")
     public ResponseEntity<?> getAnalysesByPetId(@PathVariable Long petId) {
         try {
@@ -109,8 +115,9 @@ public class AiImageAnalysisAPI {
         }
     }
 
-    // GET count analyses by user
+    // GET count analyses by user - All authenticated users
     @GetMapping("/user/{userId}/count")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'CUSTOMER')")
     @Operation(summary = "Đếm số lượng phân tích của user")
     public ResponseEntity<?> countAnalysesByUserId(@PathVariable Long userId) {
         try {
@@ -122,8 +129,9 @@ public class AiImageAnalysisAPI {
         }
     }
 
-    // POST create analysis (manual)
+    // POST create analysis (manual) - Admin and Staff only
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     @Operation(summary = "Tạo phân tích thủ công (không dùng AI)")
     public ResponseEntity<?> createAnalysis(@RequestBody AiImageAnalysis analysis) {
         try {
@@ -136,8 +144,9 @@ public class AiImageAnalysisAPI {
         }
     }
 
-    // PUT update analysis
+    // PUT update analysis - Admin and Staff only
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     @Operation(summary = "Cập nhật phân tích")
     public ResponseEntity<?> updateAnalysis(@PathVariable Long id, @RequestBody AiImageAnalysis analysis) {
         try {
@@ -149,8 +158,9 @@ public class AiImageAnalysisAPI {
         }
     }
 
-    // DELETE analysis
+    // DELETE analysis - Admin only
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Xóa phân tích")
     public ResponseEntity<?> deleteAnalysis(@PathVariable Long id) {
         try {
