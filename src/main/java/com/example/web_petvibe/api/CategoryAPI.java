@@ -26,7 +26,7 @@ public class CategoryAPI {
 
     // GET all categories - Public (ai cũng xem được)
     @GetMapping("/getAll")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'CUSTOMER')")
+    //@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'CUSTOMER')")
     public ResponseEntity<List<Category>> getAllCategories() {
         try {
             return ResponseEntity.ok(categoryService.getAllCategories());
