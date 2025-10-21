@@ -16,6 +16,7 @@ public class GetProductResponse {
     private String description;
     private Double price;
     private String imageUrl;
+    private String type;
     private Integer stock;
     private Category category;
 }

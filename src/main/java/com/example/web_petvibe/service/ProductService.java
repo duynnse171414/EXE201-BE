@@ -91,6 +91,9 @@ public class ProductService {
         if (updatedProduct.getImageUrl() != null) {
             product.setImageUrl(updatedProduct.getImageUrl());
         }
+        if (updatedProduct.getImageUrl() != null) {
+            product.setType(updatedProduct.getType());
+        }
 
         return productRepository.save(product);
     }

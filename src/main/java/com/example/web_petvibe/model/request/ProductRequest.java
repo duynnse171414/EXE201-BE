@@ -27,6 +27,8 @@ public class ProductRequest {
 
     String imageUrl;
 
+    String type;
+
     @NotNull(message = "CategoryId is required")
     private Long categoryId;
 }

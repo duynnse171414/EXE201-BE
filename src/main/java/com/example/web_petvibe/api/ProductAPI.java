@@ -47,6 +47,7 @@ public class ProductAPI {
                             p.getDescription(),
                             p.getPrice(),
                             p.getImageUrl(),
+                            p.getType(),
                             p.getStock(),
                             p.getCategory()
                     )
@@ -65,6 +66,8 @@ public class ProductAPI {
             product.setDescription(request.getDescription());
             product.setPrice(request.getPrice());
             product.setStock(request.getStock());
+            product.setImageUrl(request.getImageUrl());
+            product.setType(request.getType());
 
             Product created = productService.createProduct(product, request.getCategoryId());
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -84,6 +87,8 @@ public class ProductAPI {
             updatedProduct.setDescription(request.getDescription());
             updatedProduct.setPrice(request.getPrice());
             updatedProduct.setStock(request.getStock());
+            updatedProduct.setType(request.getType());
+            updatedProduct.setImageUrl(request.getImageUrl());
 
             Product result = productService.updateProduct(id, updatedProduct, request.getCategoryId());
             return ResponseEntity.ok(result);
