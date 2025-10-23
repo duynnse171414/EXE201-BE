@@ -171,4 +171,6 @@ public class AiImageAnalysisAPI {
                     .body(new ApiResponse(e.getMessage(), false));
         }
     }
+
+
 }

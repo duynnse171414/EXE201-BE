@@ -63,6 +63,7 @@ public class QRPaymentService {
                 .amount(amount)
                 .description(description)
                 .orderId(orderId)
+                .status("PENDING") // Trạng thái mặc định
                 .build();
     }
 
@@ -77,5 +78,8 @@ public class QRPaymentService {
         private Double amount;
         private String description;
         private Long orderId;
+
+        @lombok.Builder.Default
+        private String status = "PENDING"; // Trạng thái thanh toán: PENDING, COMPLETED, FAILED, EXPIRED
     }
 }

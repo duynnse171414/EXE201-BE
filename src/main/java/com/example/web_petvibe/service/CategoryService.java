@@ -36,6 +36,32 @@ public class CategoryService {
         category.setDeleted(false);
         return categoryRepository.save(category);
     }
+    // Cập nhật category
+    public Category updateCategory(Long id, Category categoryDetails) {
+        Optional<Category> existingCategory = categoryRepository.findByIdActive(id);
+
+        if (!existingCategory.isPresent()) {
+            throw new RuntimeException("Category not found with id: " + id);
+        }
+
+        Category category = existingCategory.get();
+
+        // Kiểm tra trùng tên (nếu tên mới khác tên cũ)
+        if (!category.getName().equals(categoryDetails.getName())
+                && categoryRepository.existsByName(categoryDetails.getName())) {
+            throw new RuntimeException("Category with name '" + categoryDetails.getName() + "' already exists");
+        }
+
+        // Cập nhật thông tin
+        category.setName(categoryDetails.getName());
+
+        // Cập nhật description nếu có
+        if (categoryDetails.getDescription() != null) {
+            category.setDescription(categoryDetails.getDescription());
+        }
+
+        return categoryRepository.save(category);
+    }
 
     // Xóa mềm category
     public void deleteCategory(Long id) {

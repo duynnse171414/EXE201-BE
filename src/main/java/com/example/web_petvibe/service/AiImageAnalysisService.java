@@ -35,7 +35,7 @@ public class AiImageAnalysisService {
     @Value("${gemini.api.url:https://generativelanguage.googleapis.com/v1beta}")
     private String geminiApiUrl;
 
-    @Value("${gemini.model:gemini-1.5-flash}")
+    @Value("${gemini.model:gemini-2.5-flash}")
     private String geminiModel;
 
     // Lấy tất cả analysis

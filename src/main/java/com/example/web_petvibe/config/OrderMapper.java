@@ -46,6 +46,8 @@ public class OrderMapper {
             paymentInfoResponse.setAccountName(paymentInfo.getAccountName());
             paymentInfoResponse.setAmount(paymentInfo.getAmount());
             paymentInfoResponse.setDescription(paymentInfo.getDescription());
+            paymentInfoResponse.setStatus(paymentInfo.getStatus());
+
             paymentInfoResponse.setMessage("Vui lòng quét mã QR để thanh toán đơn hàng. Nội dung chuyển khoản: " + paymentInfo.getDescription());
 
             response.setPaymentInfo(paymentInfoResponse);

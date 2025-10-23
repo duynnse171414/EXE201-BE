@@ -4,6 +4,7 @@ import com.example.web_petvibe.config.OrderMapper;
 import com.example.web_petvibe.entity.Order;
 import com.example.web_petvibe.model.request.OrderRequest;
 import com.example.web_petvibe.model.request.UpdateOrderStatusRequest;
+import com.example.web_petvibe.model.request.UpdatePaymentStatusRequest;
 import com.example.web_petvibe.model.response.OrderResponse;
 import com.example.web_petvibe.service.OrderService;
 import com.example.web_petvibe.service.QRPaymentService;
@@ -66,6 +67,68 @@ public class OrderAPI {
                 qrPaymentService.generatePaymentInfo(order.getId(), order.getTotalAmount());
 
         return ResponseEntity.ok(paymentInfo);
+    }
+
+    // API MỚI: Cập nhật trạng thái thanh toán
+    @PatchMapping("/{orderId}/payment-status")
+    @Operation(summary = "Update payment status for order")
+    public ResponseEntity<?> updatePaymentStatus(
+            @PathVariable Long orderId,
+            @RequestBody UpdatePaymentStatusRequest request) {
+
+        Order order = orderService.getOrderById(orderId);
+
+        // Validate payment status
+        String paymentStatus = request.getPaymentStatus().toUpperCase();
+        if (!List.of("PENDING", "COMPLETED", "FAILED", "EXPIRED").contains(paymentStatus)) {
+            return ResponseEntity.badRequest()
+                    .body("Invalid payment status. Must be: PENDING, COMPLETED, FAILED, or EXPIRED");
+        }
+
+        // Tạo PaymentInfo với status mới
+        QRPaymentService.PaymentInfo paymentInfo = qrPaymentService.generatePaymentInfo(
+                order.getId(),
+                order.getTotalAmount()
+        );
+
+        // Override status
+        paymentInfo.setStatus(paymentStatus);
+
+        // Nếu payment COMPLETED, tự động cập nhật order status thành CONFIRMED
+        if ("COMPLETED".equals(paymentStatus) && "PENDING".equals(order.getStatus())) {
+            order = orderService.updateOrderStatus(orderId, "CONFIRMED");
+        }
+
+        // Map response
+        OrderResponse response = orderMapper.toResponseWithPayment(order, paymentInfo);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // API MỚI: Xác nhận thanh toán thành công (shortcut)
+    @PostMapping("/{orderId}/confirm-payment")
+    @Operation(summary = "Confirm payment completed (shortcut API)")
+    public ResponseEntity<?> confirmPayment(@PathVariable Long orderId) {
+        Order order = orderService.getOrderById(orderId);
+
+        if (!"PENDING".equals(order.getStatus())) {
+            return ResponseEntity.badRequest()
+                    .body("Order is not in PENDING status. Current status: " + order.getStatus());
+        }
+
+        // Tạo PaymentInfo với COMPLETED status
+        QRPaymentService.PaymentInfo paymentInfo = qrPaymentService.generatePaymentInfo(
+                order.getId(),
+                order.getTotalAmount()
+        );
+        paymentInfo.setStatus("COMPLETED");
+
+        // Tự động cập nhật order status
+        order = orderService.updateOrderStatus(orderId, "PAID");
+
+        OrderResponse response = orderMapper.toResponseWithPayment(order, paymentInfo);
+
+        return ResponseEntity.ok(response);
     }
 
     // Lấy danh sách đơn hàng theo user

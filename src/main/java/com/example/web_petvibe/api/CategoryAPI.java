@@ -56,6 +56,17 @@ public class CategoryAPI {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(e.getMessage(), false));
         }
     }
+    // PUT update category - Admin only
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody Category category) {
+        try {
+            Category updated = categoryService.updateCategory(id, category);
+            return ResponseEntity.ok(new CategoryResponse("Category updated successfully", true, updated));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(e.getMessage(), false));
+        }
+    }
 
     // DELETE category - Admin only
     @DeleteMapping("/{id}")

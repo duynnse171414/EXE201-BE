@@ -41,6 +41,7 @@ public class OrderResponse {
         private String accountName;
         private Double amount;
         private String description;
+        private String status; // Trạng thái thanh toán: PENDING, COMPLETED, FAILED, EXPIRED
         private String message; // Hướng dẫn thanh toán
     }
 }
