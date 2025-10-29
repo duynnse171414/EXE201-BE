@@ -1,5 +1,6 @@
 package com.example.web_petvibe.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -33,10 +34,6 @@ public class Account implements UserDetails {
 //    @NotBlank
     String fullName;
 
-//    @NotBlank(message = "Gender can not be blank!")
-//    @Pattern(regexp = "^(Male|Female)$", message = ("Invalid Gender"))
-//    String gender; // Đổi từ Gender thành gender (lowercase)
-
 //    @Email(message = "Invalid Email!")
     @Column(unique = true)
     String email;
@@ -48,13 +45,10 @@ public class Account implements UserDetails {
     @Size(min = 6, message = "Password must be at least 6 character!")
     String password;
 
-    String petName;
-
-    String petAge;
-
-    String petType;
-
-    String petSize;
+    // Thêm quan hệ One-to-Many
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore  // Tránh vòng lặp vô hạn khi serialize JSON
+    private List<PetProfile> petProfiles = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

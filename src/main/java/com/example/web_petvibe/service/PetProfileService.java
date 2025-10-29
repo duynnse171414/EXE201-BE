@@ -2,6 +2,7 @@ package com.example.web_petvibe.service;
 
 import com.example.web_petvibe.entity.PetProfile;
 import com.example.web_petvibe.entity.Account;
+import com.example.web_petvibe.model.response.PetProfileDetailResponse;
 import com.example.web_petvibe.repository.PetProfileRepository;
 import com.example.web_petvibe.repository.AccountRepository;
 import jakarta.transaction.Transactional;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +28,8 @@ public class PetProfileService {
     @Autowired
     private final AccountRepository accountRepository;
 
-    // Lấy userId từ account đang đăng nhập
-    private Long getCurrentUserId() {
+    // Lấy Account đang đăng nhập
+    private Account getCurrentAccount() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -35,76 +37,108 @@ public class PetProfileService {
         }
 
         Object principal = authentication.getPrincipal();
+        String username;
 
         if (principal instanceof UserDetails) {
-            String username = ((UserDetails) principal).getUsername(); // username = phone
-            Account account = accountRepository.findAccountByPhone(username);
-            if (account == null) {
-                throw new RuntimeException("Account not found");
-            }
-            return account.getId();
+            username = ((UserDetails) principal).getUsername();
         } else if (principal instanceof String) {
-            String username = (String) principal; // username = phone
-            Account account = accountRepository.findAccountByPhone(username);
-            if (account == null) {
-                throw new RuntimeException("Account not found");
-            }
-            return account.getId();
+            username = (String) principal;
+        } else {
+            throw new RuntimeException("Unable to get user information");
         }
 
-        throw new RuntimeException("Unable to get user information");
+        Account account = accountRepository.findAccountByPhone(username);
+        if (account == null) {
+            throw new RuntimeException("Account not found");
+        }
+        return account;
+    }
+
+    private Long getCurrentUserId() {
+        return getCurrentAccount().getId();
+    }
+
+    // Map PetProfile sang PetProfileDetailResponse
+    private PetProfileDetailResponse mapToDetailResponse(PetProfile petProfile) {
+        PetProfileDetailResponse response = new PetProfileDetailResponse();
+        response.setPetId(petProfile.getPetId());
+        response.setUserId(petProfile.getAccount().getId());
+        response.setFullName(petProfile.getAccount().getFullName());
+        response.setPetName(petProfile.getPetName());
+        response.setPetType(petProfile.getPetType());
+        response.setBreed(petProfile.getBreed());
+        response.setBirthDate(petProfile.getBirthDate());
+        response.setWeight(petProfile.getWeight());
+        response.setPetAge(petProfile.getPetAge());
+        response.setPetSize(petProfile.getPetSize());
+        response.setHealthNotes(petProfile.getHealthNotes());
+        response.setImageUrl(petProfile.getImageUrl());
+        response.setCreatedAt(petProfile.getCreatedAt());
+        return response;
     }
 
     // Lấy tất cả pet profiles
-    public List<PetProfile> getAllPetProfiles() {
-        return petProfileRepository.findAllActive();
+    public List<PetProfileDetailResponse> getAllPetProfiles() {
+        return petProfileRepository.findAllActive()
+                .stream()
+                .map(this::mapToDetailResponse)
+                .collect(Collectors.toList());
     }
 
     // Lấy pet profile theo ID
-    public Optional<PetProfile> getPetProfileById(Long petId) {
-        return petProfileRepository.findByIdActive(petId);
+    public Optional<PetProfileDetailResponse> getPetProfileById(Long petId) {
+        return petProfileRepository.findByIdActive(petId)
+                .map(this::mapToDetailResponse);
     }
 
     // Lấy pet profiles của user hiện tại
-    public List<PetProfile> getMyPetProfiles() {
+    public List<PetProfileDetailResponse> getMyPetProfiles() {
         Long currentUserId = getCurrentUserId();
-        return petProfileRepository.findByUserIdActive(currentUserId);
+        return petProfileRepository.findByUserIdActive(currentUserId)
+                .stream()
+                .map(this::mapToDetailResponse)
+                .collect(Collectors.toList());
     }
 
     // Lấy pet profiles theo user ID (cho admin)
-    public List<PetProfile> getPetProfilesByUserId(Long userId) {
-        return petProfileRepository.findByUserIdActive(userId);
+    public List<PetProfileDetailResponse> getPetProfilesByUserId(Long userId) {
+        return petProfileRepository.findByUserIdActive(userId)
+                .stream()
+                .map(this::mapToDetailResponse)
+                .collect(Collectors.toList());
     }
 
     // Lấy pet profiles theo pet type
-    public List<PetProfile> getPetProfilesByPetType(String petType) {
-        return petProfileRepository.findByPetTypeActive(petType);
+    public List<PetProfileDetailResponse> getPetProfilesByPetType(String petType) {
+        return petProfileRepository.findByPetTypeActive(petType)
+                .stream()
+                .map(this::mapToDetailResponse)
+                .collect(Collectors.toList());
     }
 
-    // Tạo mới pet profile - TỰ ĐỘNG LẤY userId
-    public PetProfile createPetProfile(PetProfile petProfile) {
-        // Tự động set userId từ account đang đăng nhập
-        Long currentUserId = getCurrentUserId();
-        petProfile.setUserId(currentUserId);
+    // Tạo mới pet profile - TỰ ĐỘNG LẤY Account và set quan hệ
+    public PetProfileDetailResponse createPetProfile(PetProfile petProfile) {
+        Account currentAccount = getCurrentAccount();
+        petProfile.setAccount(currentAccount);
 
         if (petProfile.getPetName() == null || petProfile.getPetName().trim().isEmpty()) {
             throw new RuntimeException("Pet name is required");
         }
 
         petProfile.setDeleted(false);
-        return petProfileRepository.save(petProfile);
+        PetProfile saved = petProfileRepository.save(petProfile);
+        return mapToDetailResponse(saved);
     }
 
     // Cập nhật pet profile
-    public PetProfile updatePetProfile(Long petId, PetProfile petProfileDetails) {
+    public PetProfileDetailResponse updatePetProfile(Long petId, PetProfile petProfileDetails) {
         Optional<PetProfile> existingProfile = petProfileRepository.findByIdActive(petId);
 
         if (existingProfile.isPresent()) {
             PetProfile petProfile = existingProfile.get();
 
-            // Kiểm tra xem pet profile có thuộc về user hiện tại không
             Long currentUserId = getCurrentUserId();
-            if (!petProfile.getUserId().equals(currentUserId)) {
+            if (petProfile.getAccount().getId() != currentUserId) {
                 throw new RuntimeException("You don't have permission to update this pet profile");
             }
 
@@ -129,8 +163,15 @@ public class PetProfileService {
             if (petProfileDetails.getImageUrl() != null) {
                 petProfile.setImageUrl(petProfileDetails.getImageUrl());
             }
+            if (petProfileDetails.getPetAge() != null) {
+                petProfile.setPetAge(petProfileDetails.getPetAge());
+            }
+            if (petProfileDetails.getPetSize() != null) {
+                petProfile.setPetSize(petProfileDetails.getPetSize());
+            }
 
-            return petProfileRepository.save(petProfile);
+            PetProfile updated = petProfileRepository.save(petProfile);
+            return mapToDetailResponse(updated);
         } else {
             throw new RuntimeException("Pet profile not found with id: " + petId);
         }
@@ -143,9 +184,8 @@ public class PetProfileService {
         if (petProfile.isPresent()) {
             PetProfile p = petProfile.get();
 
-            // Kiểm tra xem pet profile có thuộc về user hiện tại không
             Long currentUserId = getCurrentUserId();
-            if (!p.getUserId().equals(currentUserId)) {
+            if (p.getAccount().getId() != currentUserId) {
                 throw new RuntimeException("You don't have permission to delete this pet profile");
             }
 

@@ -18,8 +18,11 @@ public class PetProfile {
     @Column(name = "pet_id")
     private Long petId;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    // Thêm quan hệ Many-to-One
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore  // Hoặc có thể bỏ nếu muốn trả về thông tin account
+    private Account account;
 
     @Column(name = "pet_name", nullable = false)
     private String petName;
@@ -35,6 +38,10 @@ public class PetProfile {
 
     @Column(name = "weight")
     private Float weight;
+
+    String petAge;
+
+    String petSize;
 
     @Column(name = "health_notes", columnDefinition = "TEXT")
     private String healthNotes;

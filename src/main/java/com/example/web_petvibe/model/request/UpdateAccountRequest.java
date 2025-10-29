@@ -17,11 +17,5 @@ public class UpdateAccountRequest {
     @Pattern(regexp = "(84|0[3|5|7|8|9])+(\\d{8})", message = "Invalid phone number!")
     private String phone;
 
-    private String petName;
 
-    private String petAge;
-
-    private String petType;
-
-    private String petSize;
 }

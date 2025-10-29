@@ -56,8 +56,8 @@ public class AuthenticationAPI {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("accounts")
-    public ResponseEntity<List<Account>> getAllAccounts() {
-        List<Account> accounts = authenticationService.getAllAccount();
+    public ResponseEntity<List<AccountResponse>> getAllAccounts() {
+        List<AccountResponse> accounts = authenticationService.getAllAccount();
         return ResponseEntity.ok(accounts);
     }
 

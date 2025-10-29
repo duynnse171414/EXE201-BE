@@ -2,19 +2,17 @@ package com.example.web_petvibe.model.response;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class AccountResponse {
     long id;
     String FullName;
-    String Gender;
     String email;
     String phone;
     String role;
-    String petAge;
-    String petName;
-    String petSize;
-    String petType;
     String token;
-    Long customerId;
+    List<Long> petIds;
+    List<String> petNames;
 
 }

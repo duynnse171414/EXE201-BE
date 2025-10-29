@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthenticationService implements UserDetailsService {
@@ -62,13 +63,32 @@ public class AuthenticationService implements UserDetailsService {
         }
     }
 
-    public List<Account> getAllAccount() {
-        return accountRepository.findAll();
-    }
+    public List<AccountResponse> getAllAccount() {
+        List<Account> accounts = accountRepository.findAll();
 
-    public Account getAccountById(Long accountId) {
-        return accountRepository.findById(accountId)
-                .orElseThrow(() -> new NotFoundException("Account not found"));
+        return accounts.stream()
+                .map(account -> {
+                    AccountResponse response = modelMapper.map(account, AccountResponse.class);
+
+                    // Thêm thông tin pet profiles
+                    if (account.getPetProfiles() != null && !account.getPetProfiles().isEmpty()) {
+                        List<Long> petIds = account.getPetProfiles().stream()
+                                .filter(pet -> !pet.isDeleted())
+                                .map(pet -> pet.getPetId())
+                                .collect(Collectors.toList());
+
+                        List<String> petNames = account.getPetProfiles().stream()
+                                .filter(pet -> !pet.isDeleted())
+                                .map(pet -> pet.getPetName())
+                                .collect(Collectors.toList());
+
+                        response.setPetIds(petIds);
+                        response.setPetNames(petNames);
+                    }
+
+                    return response;
+                })
+                .collect(Collectors.toList());
     }
 
     public AccountResponse login(LoginRequest loginRequest) {
@@ -81,6 +101,23 @@ public class AuthenticationService implements UserDetailsService {
             Account account = (Account) authentication.getPrincipal();
             AccountResponse accountResponse = modelMapper.map(account, AccountResponse.class);
             accountResponse.setToken(tokenService.generateToken(account));
+
+            // Thêm thông tin pet profiles
+            if (account.getPetProfiles() != null && !account.getPetProfiles().isEmpty()) {
+                List<Long> petIds = account.getPetProfiles().stream()
+                        .filter(pet -> !pet.isDeleted())
+                        .map(pet -> pet.getPetId())
+                        .collect(Collectors.toList());
+
+                List<String> petNames = account.getPetProfiles().stream()
+                        .filter(pet -> !pet.isDeleted())
+                        .map(pet -> pet.getPetName())
+                        .collect(Collectors.toList());
+
+                accountResponse.setPetIds(petIds);
+                accountResponse.setPetNames(petNames);
+            }
+
             return accountResponse;
         } catch (Exception e) {
             throw new NotFoundException("Username or password invalid!");
@@ -157,18 +194,7 @@ public class AuthenticationService implements UserDetailsService {
             }
             existingAccount.setPhone(request.getPhone());
         }
-        if (request.getPetName() != null) {
-            existingAccount.setPetName(request.getPetName());
-        }
-        if (request.getPetAge() != null) {
-            existingAccount.setPetAge(request.getPetAge());
-        }
-        if (request.getPetType() != null) {
-            existingAccount.setPetType(request.getPetType());
-        }
-        if (request.getPetSize() != null) {
-            existingAccount.setPetSize(request.getPetSize());
-        }
+
 
         return accountRepository.save(existingAccount);
     }
