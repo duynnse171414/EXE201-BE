@@ -33,7 +33,7 @@ public class ProductAPI {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    @GetMapping("/{id}")
+    @GetMapping("getProductId/{id}")
     public ResponseEntity<?> getProductById(@PathVariable Long id) {
         Optional<Product> product = productService.getProductById(id);
         if (product.isPresent()) {
