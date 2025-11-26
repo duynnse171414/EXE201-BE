@@ -107,7 +107,8 @@ public class OrderAPI {
 
     // API MỚI: Xác nhận thanh toán thành công (shortcut)
     @PostMapping("/{orderId}/confirm-payment")
-    @Operation(summary = "Confirm payment completed (shortcut API)")
+    @PreAuthorize("hasAuthority('ADMIN''STAFF')")
+    @Operation(summary = "Confirm payment completed (Admin/Staff only)")
     public ResponseEntity<?> confirmPayment(@PathVariable Long orderId) {
         Order order = orderService.getOrderById(orderId);
 
