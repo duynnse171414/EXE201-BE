@@ -24,7 +24,7 @@ public class ReviewAPI {
 
     // GET all reviews - Public hoặc Admin
     @GetMapping("/getAll")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     public ResponseEntity<List<Review>> getAllReviews() {
         try {
             return ResponseEntity.ok(reviewService.getAllReviews());
@@ -87,7 +87,7 @@ public class ReviewAPI {
 
     // DELETE review - Chỉ owner hoặc admin
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @reviewService.isReviewOwner(#id)")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF') or @reviewService.isReviewOwner(#id)")
     public ResponseEntity<?> deleteReview(@PathVariable Long id) {
         try {
             reviewService.deleteReview(id);
